@@ -1,0 +1,6 @@
+.vscode/
+.vs/
+.idea/
+out/
+CMakeFiles/
+CMakeCache.txt
