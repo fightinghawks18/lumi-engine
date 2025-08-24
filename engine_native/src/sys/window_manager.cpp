@@ -19,14 +19,14 @@ namespace lumi::sys
         return true;
     }
 
-    WinRef WindowManager::CreateWindow(const WindowProperties& properties)
+    WinPtr WindowManager::CreateWindow(const WindowProperties& properties)
     {
         auto win = std::make_shared<Window>();
         if (!win->Init(properties))
         {
             std::cerr << "Failed to create a new window " << SDL_GetError() << std::endl;
             win.reset();
-            return std::weak_ptr<Window>{};
+            return nullptr;
         }
         _windows.push_back(win);
         return win;

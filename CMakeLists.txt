@@ -22,9 +22,6 @@ set(LIBRARY_EXTS lib a)
 # Add subdirectories to collect libraries
 add_subdirectory(engine_native)
 add_subdirectory(engine_glue)
-
-# Add C++ applications (for testing)
-add_subdirectory(apps/native)
  
 # Add C++ tests
 add_subdirectory(tests)
