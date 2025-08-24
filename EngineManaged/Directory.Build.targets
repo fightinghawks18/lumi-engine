@@ -1,0 +1,27 @@
+<Project>
+  <Target Name="Install" AfterTargets="Build">
+    <ItemGroup>
+      <RuntimeFiles Include="$(TargetDir)*.dll;$(TargetDir)*.exe;$(TargetDir)*.pdb;$(TargetDir)*.runtimeconfig.json" />
+      <PublishedFiles Include="$(PublishDir)**\*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(RuntimeFiles)"
+      DestinationFolder="$(BinDir)"
+      SkipUnchangedFiles="true"
+    />
+
+    
+  </Target>
+
+    <Target Name="InstallPublished" AfterTargets="Publish">
+    <ItemGroup>
+      <PublishedFiles Include="$(PublishDir)**\*" />
+      <ExistingPublishedFiles Include="@(PublishedFiles)" Condition="Exists('%(PublishedFiles.FullPath)')" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(ExistingPublishedFiles)"
+      DestinationFolder="$(BinDir)%(RecursiveDir)"
+      SkipUnchangedFiles="true"
+    />
+  </Target>
+</Project>

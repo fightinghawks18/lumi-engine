@@ -8,7 +8,6 @@
 namespace lumi::sys
 {
     using WinPtr = std::shared_ptr<Window>;
-    using WinRef = std::weak_ptr<Window>;
 
     /**
      * \brief Manages the creation, lifetime, and destruction of windows while allowing easy access to them
@@ -24,8 +23,14 @@ namespace lumi::sys
          * \warning This must be called once and not while it has already started
          */
         static bool Init();
-
-        WinRef CreateWindow(const WindowProperties& properties);
+        
+        /**
+         * \brief Create a Window object
+         * 
+         * \param properties The initial properties the window should have at creation
+         * \return WinRef 
+         */
+        WinPtr CreateWindow(const WindowProperties& properties);
 
         /**
          * \brief Updates all windows attached to this manager

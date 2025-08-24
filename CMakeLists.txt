@@ -22,9 +22,12 @@ set(LIBRARY_EXTS lib a)
 # Add subdirectories to collect libraries
 add_subdirectory(engine_native)
 add_subdirectory(engine_glue)
-
-# Add C++ applications (for testing)
-add_subdirectory(apps/native)
  
 # Add C++ tests
 add_subdirectory(tests)
+
+# Install C# after building
+add_custom_target(dotnet_publish ALL
+    COMMAND dotnet publish "${PROJECT_DIR}/EngineManaged/EngineManaged.sln"
+    COMMENT "Running install and then publishing .NET project"
+)

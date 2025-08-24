@@ -1,6 +1,6 @@
 find_package(SDL3 CONFIG REQUIRED)
 
-add_library(syslib SHARED
+add_library(syslib STATIC
         window.cpp
         window_manager.cpp
 )

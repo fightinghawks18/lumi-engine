@@ -4,3 +4,9 @@
 out/
 CMakeFiles/
 CMakeCache.txt
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
