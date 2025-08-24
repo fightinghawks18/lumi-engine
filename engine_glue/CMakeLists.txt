@@ -1,2 +1,2 @@
-include_directories(include) # Ensure libraries from this subdirectory and child directories have access to the headers
+set(GLUE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_subdirectory(src)
