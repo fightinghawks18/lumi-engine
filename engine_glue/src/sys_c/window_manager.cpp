@@ -3,7 +3,7 @@
 #include <sys_c/window_manager.h>
 #include <sys/window_manager.h>
 
-C_API_FUNC(SYS_C_API, WindowManager *, window_manager_create, void)
+C_API_FUNC(SYS_C_API, WindowManager*, window_manager_create, void)
 {
     auto winManager = new lumi::sys::WindowManager();
     if (!winManager->Init())
@@ -15,7 +15,7 @@ C_API_FUNC(SYS_C_API, WindowManager *, window_manager_create, void)
     return reinterpret_cast<WindowManager*>(winManager);
 }
 
-C_API_FUNC(SYS_C_API, Window *, window_manager_create_window, WindowManager *wm)
+C_API_FUNC(SYS_C_API, Window *, window_manager_create_window, WindowManager* wm)
 {
     auto winManager = reinterpret_cast<lumi::sys::WindowManager*>(wm);
     auto win = winManager->CreateWindow({
@@ -28,7 +28,14 @@ C_API_FUNC(SYS_C_API, Window *, window_manager_create_window, WindowManager *wm)
     return reinterpret_cast<Window*>(win.get());
 }
 
-C_API_FUNC(SYS_C_API, void, window_manager_destroy, WindowManager *wm)
+
+C_API_FUNC(SYS_C_API, void, window_manager_update, WindowManager* wm)
+{
+    auto winManager = reinterpret_cast<lumi::sys::WindowManager*>(wm);
+    return winManager->Update();
+}
+
+C_API_FUNC(SYS_C_API, void, window_manager_destroy, WindowManager* wm)
 {
     delete reinterpret_cast<lumi::sys::WindowManager*>(wm);
 }

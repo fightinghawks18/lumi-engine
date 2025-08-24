@@ -14,6 +14,7 @@ C_API_STRUCT WindowProperties {
 
 C_API_FUNC(SYS_C_API, WindowManager*, window_manager_create, void);
 C_API_FUNC(SYS_C_API, Window*, window_manager_create_window, WindowManager* wm);
+C_API_FUNC(SYS_C_API, void, window_manager_update, WindowManager* wm);
 C_API_FUNC(SYS_C_API, void, window_manager_destroy, WindowManager* wm);
 
 C_API_END

@@ -14,6 +14,7 @@ public class WindowManager
         return new Window(WindowManagerNative.CreateWindow(_nativeHandle));
     }
 
+    public void Update() => WindowManagerNative.Update(_nativeHandle);
     public void Delete()
     {
         if (_nativeHandle != IntPtr.Zero)

@@ -17,6 +17,12 @@ C_API_FUNC(SYS_C_API, Window*, window_create, void)
     return reinterpret_cast<Window*>(win);
 }
 
+C_API_FUNC(SYS_C_API, bool, window_closing, Window* w)
+{
+    auto win = reinterpret_cast<lumi::sys::Window*>(w);
+    return win->Closing();
+}
+
 C_API_FUNC(SYS_C_API, void, window_destroy, Window* w)
 {
     delete reinterpret_cast<lumi::sys::Window*>(w);

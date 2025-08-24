@@ -5,6 +5,10 @@ Console.WriteLine("Hello, World!");
 var windowManager = new WindowManager();
 var window = windowManager.CreateWindow();
 
-Thread.Sleep(1000);
+while (true)
+{
+    if (window.Closing()) break;
+    windowManager.Update();
+}
 
-windowManager.Delete();
+ windowManager.Delete();
