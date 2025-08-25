@@ -1,4 +1,4 @@
-#include <iostream>
+#include <algorithm>
 #include <sys/window.h>
 
 namespace lumi::sys
@@ -53,10 +53,18 @@ namespace lumi::sys
 
         // Set window creation properties first
         _title = properties.title;
+        _icon = properties.icon;
         _x = properties.x;
         _y = properties.y;
         _width = properties.w;
         _height = properties.h;
+        _wMin = properties.wMin;
+        _wMax = properties.wMax;
+        _hMin = properties.hMin;
+        _hMax = properties.hMax;
+        _mode = properties.mode;
+        _resizable = properties.resizable;
+        _bordered = properties.bordered;
 
         // Create window
         _handle = CreateWindowObject();
@@ -69,25 +77,210 @@ namespace lumi::sys
         }
 
         // Assign properties that aren't included in SDL_CreateWindow
-        SDL_SetWindowPosition(_handle, _x, _y);
+        Warp(_x, _y);
+        SetBordered(_bordered);
+        SetResizable(_resizable);
+        SetMode(_mode);
+        SetIcon(_icon);
 
         return true;
     }
 
     void Window::Process(const SDL_Event& event)
     {
-        // Ensure that this event belongs to this window
+        // Run window only events if this event belongs to the window
         if (GetID() != event.window.windowID)
         {
-            std::cerr << "Event given with ID " << event.window.windowID
-                      << "doesn't match this window's " << GetID() << std::endl;
             return;
         }
 
-        if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
+        // Run window-specific events
+        switch (event.type)
         {
-            _needsClose = true;
+            case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+            case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+            {
+                if (_mode != WindowMode::FullscreenBorderless)
+                {
+                    break;
+                }
+
+                SDL_Rect displayBounds;
+                if (!GetDisplayBounds(&displayBounds))
+                {
+                    break;
+                }
+                SDL_SetWindowPosition(_handle, displayBounds.x, displayBounds.y);
+                SDL_SetWindowSize(_handle, displayBounds.w, displayBounds.h);
+                break;
+            }
+            case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+            {
+                _needsClose = true;
+                break;
+            }
         }
+    }
+
+    void Window::Warp(const int x, const int y)
+    {
+        _x = x;
+        _y = y;
+
+        if (_mode != WindowMode::Windowed) return;
+        SDL_SetWindowPosition(_handle, _x, _y);
+    }
+
+    void Window::WarpRelative(const int x, const int y)
+    {
+        // Get display that the window is currently on
+        SDL_Rect displayBounds;
+        if (!GetDisplayBounds(&displayBounds))
+        {
+            return;
+        }
+        
+        int screenW = displayBounds.w;
+        int screenH = displayBounds.h;
+
+        // Move window relative to the display's scale
+        Warp(
+            screenW * x, 
+            screenH * y
+        );
+    }
+
+    void Window::Resize(int w, int h)
+    {
+        w = std::clamp(w, _wMin, _wMax);
+        h = std::clamp(h, _hMin, _hMax);
+
+        _w = w;
+        _h = h;
+
+        if (_mode != WindowMode::Windowed) return;
+        SDL_SetWindowSize(_handle, w, h);
+    }
+
+    void Window::SetName(const std::string& name)
+    {
+        _title = name;
+        SDL_SetWindowTitle(_handle, _title.c_str());
+    }
+
+    void Window::SetIcon(const std::string& icon)
+    {
+        if (_icon == icon) return;
+
+        // Load image path as a surface
+        SDL_Surface* surface = SDL_LoadBMP(icon.c_str());
+        if (!surface)
+        {
+            std::cerr << "Failed to load surface icon for window " << GetID()
+                      << SDL_GetError() << std::endl;
+            return;
+        }
+
+        SDL_SetWindowIcon(_handle, surface);
+        SDL_DestroySurface(surface);
+        _icon = icon;
+    }
+
+    void Window::SetSizeLimits(int wMin, int wMax, int hMin, int hMax)
+    {
+        // Handle width
+        wMax = std::clamp(wMax, wMin, wMax); // Can't be below min
+
+        // Handle height
+        hMax = std::clamp(hMax, hMin, hMax); // Can't be below min
+
+        _hMin = hMin;
+        _wMin = wMin;
+        _hMax = hMax;
+        _wMax = wMax;
+        if (_mode != WindowMode::Windowed) return;
+        SDL_SetWindowMinimumSize(_handle, _wMin, _hMin);
+        SDL_SetWindowMaximumSize(_handle, _wMax, _hMax);
+    }
+
+    void Window::SetWidthLimits(int min, int max)
+    {
+        SetSizeLimits(min, max, _hMin, _hMax);
+    }
+
+    void Window::SetHeightLimits(int min, int max)
+    {
+        SetSizeLimits(_wMin, _wMax, min, max);
+    }
+
+    void Window::SetResizable(const bool resizable)
+    {
+        _resizable = resizable;
+        if (_mode != WindowMode::Windowed) return;
+        SDL_SetWindowResizable(_handle, _resizable);
+    }
+
+    void Window::SetBordered(const bool bordered)
+    {
+        _bordered = bordered;
+        if (_mode != WindowMode::Windowed) return;
+        SDL_SetWindowBordered(_handle, _bordered);
+    }
+
+    void Window::SetMode(const WindowMode& mode)
+    {
+        if (_mode == mode) return;
+
+        switch (mode)
+        {
+            case WindowMode::Windowed:
+            {
+                if (_mode == WindowMode::Fullscreen)
+                {
+                    SDL_SetWindowFullscreen(_handle, false);
+                }
+
+                // Reinstate window properties
+                SetBordered(_bordered);
+                SetResizable(_resizable);
+                Warp(_x, _y);
+                Resize(_w, _h);
+                SetSizeLimits(_wMin, _wMax, _hMin, _hMax);
+                break;
+            }
+            case WindowMode::Fullscreen:
+            {
+                SDL_SetWindowFullscreen(_handle, true);
+                break;
+            }
+            case WindowMode::FullscreenBorderless:
+            {
+                SDL_Rect displayBounds;
+                if (!GetDisplayBounds(&displayBounds))
+                {
+                    break;
+                }
+
+                if (_mode == WindowMode::Fullscreen)
+                {
+                    SDL_SetWindowFullscreen(_handle, false);
+                }
+
+                // Remove size limits
+                SDL_SetWindowMinimumSize(_handle, 0, 0);
+                SDL_SetWindowMaximumSize(_handle, 0, 0);
+                
+                // Remove border and resizing properties
+                SDL_SetWindowBordered(_handle, false);
+                SDL_SetWindowResizable(_handle, false);
+
+                // Move window to top-left and resize to cover screen
+                Warp(displayBounds.x, displayBounds.y);
+                Resize(displayBounds.w, displayBounds.h);
+                break;
+            }
+        }
+        _mode = mode;
     }
 
     void Window::Destroy()

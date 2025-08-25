@@ -4,6 +4,12 @@
     <ProjectReference Include="..\..\Libraries\Lumi.Sys\Lumi.Sys.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Assets\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <PropertyGroup>
     <AssemblyTitle>My Test App</AssemblyTitle>
     <Company>No Company</Company>

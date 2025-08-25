@@ -34,20 +34,13 @@ namespace lumi::sys
 
     void WindowManager::Update()
     {
-        std::unordered_map<SDL_Window*, WinPtr> idToWindowMap;
-        for (const WinPtr& win : _windows)
-        {
-            idToWindowMap[win->GetHandle()] = win;
-        }
-
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
-            SDL_Window* winFromEvent = SDL_GetWindowFromEvent(&e);
-            if (!winFromEvent) continue;
-
-            const WinPtr win = idToWindowMap[winFromEvent];
-            win->Process(e);
+            for (const auto& win : _windows)
+            {
+                win->Process(e);
+            }
         }
     }
 

@@ -1,16 +1,25 @@
 ﻿using Lumi.Sys;
 
-Console.WriteLine("Hello, World!");
+string dir = AppContext.BaseDirectory;
+string iconPath = Path.Combine(dir, "../../assets", "icon.bmp");
 
 var windowManager = new WindowManager();
 
 var winProps = new WindowProperties
 {
     title = "Test Window",
-    x = 1200,
-    y = 300,
+    icon = iconPath,
+    x = Window.GetWindowPosCentered(),
+    y = Window.GetWindowPosCentered(),
     w = 800,
-    h = 600
+    h = 600,
+    wMin = 800,
+    wMax = 1200,
+    hMin = 600,
+    hMax = 1200,
+    mode = WindowMode.Windowed,
+    resizable = true,
+    bordered = true
 };
 
 var win = windowManager.CreateWindow(winProps);

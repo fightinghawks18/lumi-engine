@@ -19,14 +19,22 @@ C_API_FUNC(SYS_C_API, Window*, window_manager_create_window, WindowManager* wm, 
 {
     auto winManager = reinterpret_cast<lumi::sys::WindowManager*>(wm);
     
-    lumi::sys::WindowProperties winProps{};
-    winProps.title = props.title;
-    winProps.w = props.w;
-    winProps.h = props.h;
-    winProps.x = props.x;
-    winProps.y = props.y;
+    lumi::sys::WindowProperties cppProps{};
+    cppProps.title = props.title;
+    cppProps.icon = props.icon;
+    cppProps.x = props.x;
+    cppProps.y = props.y;
+    cppProps.w = props.w;
+    cppProps.h = props.h;
+    cppProps.wMin = props.wMin;
+    cppProps.wMax = props.wMax;
+    cppProps.hMin = props.hMin;
+    cppProps.hMax = props.hMax;
+    cppProps.mode = static_cast<lumi::sys::WindowMode>(props.mode);
+    cppProps.resizable = props.resizable != 0;
+    cppProps.bordered = props.bordered != 0;
 
-    auto win = winManager->CreateWindow(winProps);
+    auto win = winManager->CreateWindow(cppProps);
     return reinterpret_cast<Window*>(win.get());
 }
 
