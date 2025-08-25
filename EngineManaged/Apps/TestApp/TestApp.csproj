@@ -5,6 +5,15 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <AssemblyTitle>My Test App</AssemblyTitle>
+    <Company>No Company</Company>
+    <Product>My Game Engine</Product>
+    <Version>1.0.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Description>C# to C++</Description>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
