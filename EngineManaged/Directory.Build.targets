@@ -9,11 +9,21 @@
       DestinationFolder="$(BinDir)"
       SkipUnchangedFiles="true"
     />
-
-    
   </Target>
 
-    <Target Name="InstallPublished" AfterTargets="Publish">
+  <Target Name="CopyAssets" AfterTargets="Build">
+    <ItemGroup>
+      <AssetFiles Include="Assets\**\*" Condition="Exists('Assets')" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(AssetFiles)"
+      DestinationFolder="$(BinDir)..\Assets\%(RecursiveDir)"
+      SkipUnchangedFiles="true"
+      Condition="@(AssetFiles->Count()) &gt; 0"
+    />
+  </Target>
+
+  <Target Name="InstallPublished" AfterTargets="Publish">
     <ItemGroup>
       <PublishedFiles Include="$(PublishDir)**\*" />
       <ExistingPublishedFiles Include="@(PublishedFiles)" Condition="Exists('%(PublishedFiles.FullPath)')" />

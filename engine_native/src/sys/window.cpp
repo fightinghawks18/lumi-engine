@@ -53,18 +53,8 @@ namespace lumi::sys
 
         // Set window creation properties first
         _title = properties.title;
-        _icon = properties.icon;
-        _x = properties.x;
-        _y = properties.y;
         _width = properties.w;
         _height = properties.h;
-        _wMin = properties.wMin;
-        _wMax = properties.wMax;
-        _hMin = properties.hMin;
-        _hMax = properties.hMax;
-        _mode = properties.mode;
-        _resizable = properties.resizable;
-        _bordered = properties.bordered;
 
         // Create window
         _handle = CreateWindowObject();
@@ -77,11 +67,12 @@ namespace lumi::sys
         }
 
         // Assign properties that aren't included in SDL_CreateWindow
-        Warp(_x, _y);
-        SetBordered(_bordered);
-        SetResizable(_resizable);
-        SetMode(_mode);
-        SetIcon(_icon);
+        Warp(properties.x, properties.y);
+        SetBordered(properties.bordered);
+        SetResizable(properties.resizable);
+        SetSizeLimits(properties.wMin, properties.wMax, properties.hMin, properties.hMax);
+        SetMode(properties.mode);
+        SetIcon(properties.icon);
 
         return true;
     }
@@ -170,8 +161,6 @@ namespace lumi::sys
 
     void Window::SetIcon(const std::string& icon)
     {
-        if (_icon == icon) return;
-
         // Load image path as a surface
         SDL_Surface* surface = SDL_LoadBMP(icon.c_str());
         if (!surface)
@@ -229,8 +218,6 @@ namespace lumi::sys
 
     void Window::SetMode(const WindowMode& mode)
     {
-        if (_mode == mode) return;
-
         switch (mode)
         {
             case WindowMode::Windowed:
@@ -275,8 +262,8 @@ namespace lumi::sys
                 SDL_SetWindowResizable(_handle, false);
 
                 // Move window to top-left and resize to cover screen
-                Warp(displayBounds.x, displayBounds.y);
-                Resize(displayBounds.w, displayBounds.h);
+                SDL_SetWindowPosition(_handle, displayBounds.x, displayBounds.y);
+                SDL_SetWindowSize(_handle, displayBounds.w, displayBounds.h);
                 break;
             }
         }

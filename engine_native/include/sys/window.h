@@ -184,15 +184,21 @@ namespace lumi::sys
         [[nodiscard]] bool GetDisplayBounds(SDL_Rect* rect) 
         {
             SDL_DisplayID displayIdx = SDL_GetDisplayForWindow(_handle);
+            if (displayIdx == 0)
+            {
+                std::cout << "Failed to get display index for window " << GetID() << "; " 
+                          << "Falling back to primary display" << std::endl;
+                displayIdx = SDL_GetPrimaryDisplay();
+            }
             SDL_Rect displayBounds;
-            if (SDL_GetDisplayBounds(displayIdx, &displayBounds) != 0) // Ensure that we can retrieve a rectangle of the display
+            if (!SDL_GetDisplayBounds(displayIdx, &displayBounds)) // Ensure that we can retrieve a rectangle of the display
             {
                 std::cerr << "Failed to get display bounds for window " << GetID() 
-                          << ", WarpRelative cannot proceed " 
+                          << " "
                           << SDL_GetError() << std::endl;
                 return false;
             }
-            rect = &displayBounds;
+            *rect = displayBounds;
             return true;
         }
 

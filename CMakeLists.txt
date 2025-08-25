@@ -16,8 +16,6 @@ endif()
 # Variables
 set(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMACROS "${PROJECT_DIR}/cmake") # CMake macros
-set(BINARY_EXTS dll dylib so exe)
-set(LIBRARY_EXTS lib a)
 
 # Add subdirectories to collect libraries
 add_subdirectory(engine_native)
@@ -40,6 +38,7 @@ endif()
 add_custom_target(dotnet_publish ALL
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_INSTALL_PREFIX}/bin"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_INSTALL_PREFIX}/bin"
+    COMMAND dotnet restore "${PROJECT_DIR}/EngineManaged/EngineManaged.sln"
     COMMAND dotnet publish -c ${CMAKE_BUILD_TYPE} "${PROJECT_DIR}/EngineManaged/EngineManaged.sln"
     COMMENT "Running install and then publishing .NET project"
 )
