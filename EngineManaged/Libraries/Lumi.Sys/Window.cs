@@ -4,7 +4,6 @@ public class Window
     private IntPtr _nativePtr;
 
     internal Window(IntPtr nativeHandle) => _nativePtr = nativeHandle;
-    public Window() => _nativePtr = WindowNative.Create();
     public bool Closing() => WindowNative.Closing(_nativePtr);
     public void Delete()
     {
