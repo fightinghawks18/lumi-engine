@@ -27,7 +27,19 @@ add_subdirectory(engine_glue)
 add_subdirectory(tests)
 
 # Install C# after building
+if(WIN32)
+    set(DOTNET_RUNTIME win-x64)
+elseif(APPLE)
+    set(DOTNET_RUNTIME osx-x64)
+elseif(UNIX)
+    set(DOTNET_RUNTIME linux-x64)
+else()
+    set(DOTNET_RUNTIME win-x64) # Default fallback
+endif()
+
 add_custom_target(dotnet_publish ALL
-    COMMAND dotnet publish "${PROJECT_DIR}/EngineManaged/EngineManaged.sln"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_INSTALL_PREFIX}/bin"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_INSTALL_PREFIX}/bin"
+    COMMAND dotnet publish -c ${CMAKE_BUILD_TYPE} "${PROJECT_DIR}/EngineManaged/EngineManaged.sln"
     COMMENT "Running install and then publishing .NET project"
 )

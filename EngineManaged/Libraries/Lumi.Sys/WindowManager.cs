@@ -9,12 +9,13 @@ public class WindowManager
         _nativeHandle = WindowManagerNative.Create();
     }
 
-    public Window CreateWindow()
+    public Window CreateWindow(WindowProperties props)
     {
-        return new Window(WindowManagerNative.CreateWindow(_nativeHandle));
+        return new Window(WindowManagerNative.CreateWindow(_nativeHandle, props));
     }
 
     public void Update() => WindowManagerNative.Update(_nativeHandle);
+    
     public void Delete()
     {
         if (_nativeHandle != IntPtr.Zero)

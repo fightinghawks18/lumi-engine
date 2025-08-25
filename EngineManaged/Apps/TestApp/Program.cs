@@ -3,11 +3,21 @@
 Console.WriteLine("Hello, World!");
 
 var windowManager = new WindowManager();
-var window = windowManager.CreateWindow();
+
+var winProps = new WindowProperties
+{
+    title = "Test Window",
+    x = 1200,
+    y = 300,
+    w = 800,
+    h = 600
+};
+
+var win = windowManager.CreateWindow(winProps);
 
 while (true)
 {
-    if (window.Closing()) break;
+    if (win.Closing()) break;
     windowManager.Update();
 }
 
