@@ -209,6 +209,9 @@ namespace lumi::sys
          */
         [[nodiscard]] bool Closing() const { return _needsClose; }
 
+        [[nodiscard]] int GetWidth() const { return _width; }
+        [[nodiscard]] int GetHeight() const { return _height; }
+
         /**
          * \brief Retrieves the handle.
          * \return SDL_Window - The handle associated with this window.

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <sys/window_manager.h>
+#include <debugging/logger.h>
 
 namespace lumi::sys
 {
@@ -13,18 +14,18 @@ namespace lumi::sys
     {
         if (!Window::Start())
         {
-            std::cerr << "Failed to start video service" << std::endl;
+            debugging::Logger::Instance().LogError("Failed to start window service: {}", SDL_GetError());
             return false;
         }
         return true;
     }
 
-    WinPtr WindowManager::CreateWindow(const WindowProperties& properties)
+    WinPtr WindowManager::NewWindow(const WindowProperties& properties)
     {
         auto win = std::make_shared<Window>();
         if (!win->Init(properties))
         {
-            std::cerr << "Failed to create a new window " << SDL_GetError() << std::endl;
+            debugging::Logger::Instance().LogError("Failed to create window: {}", SDL_GetError());
             win.reset();
             return nullptr;
         }

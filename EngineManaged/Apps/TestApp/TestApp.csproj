@@ -4,10 +4,6 @@
     <ProjectReference Include="..\..\Libraries\Lumi.Sys\Lumi.Sys.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ini-parser" Version="2.5.2" />
-  </ItemGroup>
-
   <PropertyGroup>
     <AssemblyTitle>My Test App</AssemblyTitle>
     <Company>No Company</Company>

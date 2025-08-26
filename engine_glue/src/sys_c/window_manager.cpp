@@ -34,7 +34,7 @@ C_API_FUNC(SYS_C_API, Window*, window_manager_create_window, WindowManager* wm, 
     cppProps.resizable = props.resizable != 0;
     cppProps.bordered = props.bordered != 0;
 
-    auto win = winManager->CreateWindow(cppProps);
+    auto win = winManager->NewWindow(cppProps);
     return reinterpret_cast<Window*>(win.get());
 }
 

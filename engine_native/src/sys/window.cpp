@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <sys/window.h>
+#include <debugging/logger.h>
 
 namespace lumi::sys
 {
@@ -7,13 +8,14 @@ namespace lumi::sys
     {
         if (SDL_WasInit(SDL_INIT_VIDEO))
         {
-            std::cout << "SDL has already been initialized!" << std::endl;
+            debugging::Logger::Instance().LogWarn("SDL was already initialized, cannot start");
             return false;
         }
 
         if (!SDL_Init(SDL_INIT_VIDEO))
         {
-            std::cout << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+            debugging::Logger::Instance().LogError("Failed to initialize SDL: {}", SDL_GetError());
+            return false;
         }
         return true;
     }
@@ -22,7 +24,7 @@ namespace lumi::sys
     {
         if (!SDL_WasInit(SDL_INIT_VIDEO))
         {
-            std::cout << "SDL isn't initialized!" << std::endl;
+            debugging::Logger::Instance().LogWarn("SDL isn't initialized, cannot close");
             return false;
         }
 
@@ -40,14 +42,14 @@ namespace lumi::sys
         // Ensure SDL is initialized before creating a window
         if (!SDL_WasInit(SDL_INIT_VIDEO))
         {
-            std::cerr << "You must initialize SDL before creating windows" << std::endl;
+            debugging::Logger::Instance().LogError("SDL must be initialized before creating windows");
             return false;
         }
 
         // Ensure window wasn't already created
         if (_handle)
         {
-            std::cerr << "This window was already created! ID: " << GetID() << std::endl;
+            debugging::Logger::Instance().LogWarn("Window {} has already been created", GetID());
             return false;
         }
 
@@ -62,7 +64,7 @@ namespace lumi::sys
         // Ensure window creation was successful
         if (!_handle)
         {
-            std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
+            debugging::Logger::Instance().LogError("Window creation failed: {}", SDL_GetError());
             return false;
         }
 
@@ -165,8 +167,7 @@ namespace lumi::sys
         SDL_Surface* surface = SDL_LoadBMP(icon.c_str());
         if (!surface)
         {
-            std::cerr << "Failed to load surface icon for window " << GetID()
-                      << SDL_GetError() << std::endl;
+            debugging::Logger::Instance().LogError("Window {} failed to load window icon: {}", GetID(), SDL_GetError());
             return;
         }
 

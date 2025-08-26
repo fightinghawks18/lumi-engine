@@ -30,7 +30,7 @@ namespace lumi::sys
          * \param properties The initial properties the window should have at creation
          * \return WinRef 
          */
-        WinPtr CreateWindow(const WindowProperties& properties);
+        WinPtr NewWindow(const WindowProperties& properties);
 
         /**
          * \brief Updates all windows attached to this manager

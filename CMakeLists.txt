@@ -5,11 +5,12 @@ project(Engine)
 
 # Configure
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../lumi" CACHE PATH "Install path" FORCE) # All files install to lumi directory
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(WIN32)
+    add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON) # Allow exporting all symbols without declspec 
 endif()
 
