@@ -1,12 +1,18 @@
 #pragma once
 
+#include <vector>
+#include "render_target.h"
+
 namespace lumi::gfx
 {
+    struct RenderOrchestration
+    {
+        std::vector<std::pair<IRenderTarget*, RenderOrchestrator>> orchestrators;
+    };
+
     /**
      * \brief Handles rendering operations/management
-     * \tparam D The Device type this renderer is tied to
      */
-    template <typename D>
     class IRenderer
     {
     public: 
@@ -17,6 +23,9 @@ namespace lumi::gfx
          * \return false Initialization failed
          */
         virtual bool Init() = 0;
+
+        virtual RenderOrchestration& StartRendering() = 0;
+        virtual void EndRendering(RenderOrchestration& orchestration) = 0;
 
         /**
          * \brief Cleans up the renderer context

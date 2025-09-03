@@ -1,6 +1,8 @@
 add_library(gfxlib STATIC
     device.cpp
     renderer.cpp
+
+    render/render_orchestrator.cpp
 )
 
 target_include_directories(gfxlib PUBLIC

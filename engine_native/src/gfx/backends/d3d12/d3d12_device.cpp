@@ -1,4 +1,4 @@
-#include <gfx/backends/d3d12/d3d12_device.h>
+#include <d3d12_device.h>
 #include <debugging/logger.h>
 #include <comdef.h>
 
@@ -10,6 +10,7 @@ namespace lumi::gfx::d3d12
         if (!ChooseAdapter()) return false;
         if (!CreateD3D12Device()) return false;
         if (!CreateCommandQueue()) return false;
+        if (!CreateRTVHeap()) return false;
         return true;
     }
 
@@ -24,16 +25,7 @@ namespace lumi::gfx::d3d12
     bool D3D12Device::CreateDXGIFactory()
     {
         HRESULT hr = CreateDXGIFactory2(0, IID_PPV_ARGS(&_dxgiFactory));
-        if (FAILED(hr))
-        {
-            _com_error err(hr);
-            debugging::Logger::Instance().LogError(
-                "Failed to create DXGI Factory (HRESULT: 0x{:08X}): {}",
-                static_cast<unsigned int>(hr), err.ErrorMessage()
-            );
-            return false;
-        }
-        return true;
+        return !debugging::Logger::Instance().LogIfHRESULTFailure(hr, "Failed to create DXGI Factory");
     }
 
     bool D3D12Device::ChooseAdapter()
@@ -86,16 +78,8 @@ namespace lumi::gfx::d3d12
             D3D_FEATURE_LEVEL_11_0,
             IID_PPV_ARGS(&_device)
         );
-        if (FAILED(hr))
-        {
-            _com_error err(hr);
-            debugging::Logger::Instance().LogError(
-                "Failed to create D3D12 Device (HRESULT: 0x{:08X}): {}",
-                static_cast<unsigned int>(hr), err.ErrorMessage()
-            );
-            return false;
-        }
-        return true;
+
+        return !debugging::Logger::Instance().LogIfHRESULTFailure(hr, "Failed to create D3D12 Device");
     }
 
     bool D3D12Device::CreateCommandQueue()
@@ -110,16 +94,41 @@ namespace lumi::gfx::d3d12
             &desc, 
             IID_PPV_ARGS(&_commandQueue)
         );
-        if (FAILED(hr))
+
+        if (debugging::Logger::Instance().LogIfHRESULTFailure(hr, "Failed to create D3D12 Command Queue"))
         {
-            _com_error err(hr);
-            debugging::Logger::Instance().LogError(
-                "Failed to create D3D12 Command Queue (HRESULT: 0x{:08X}): {}",
-                static_cast<unsigned int>(hr), err.ErrorMessage()
-            );
+            if (IsDeviceLost())
+            {
+                debugging::Logger::Instance().LogError(
+                    "D3D12 DEVICE WAS LOST, REASON: 0x{:08X}", GetDeviceRemovedReason()
+                );
+            }
             return false;
         }
+
         return true;
+    }
+
+    bool D3D12Device::CreateRTVHeap()
+    {
+        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+        desc.NumDescriptors = _rtvHeapSize;
+        desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+        desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+
+        HRESULT hr = _device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&_rtvHeap));
+        if (debugging::Logger::Instance().LogIfHRESULTFailure(hr, "Failed to create D3D12 descriptor heap"))
+        {
+            return false;
+        }
+
+        _rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+        return true;
+    }
+
+    void D3D12Device::DestroyRTVHeap()
+    {
+        _rtvHeap.Reset();
     }
 
     void D3D12Device::DestroyCommandQueue()

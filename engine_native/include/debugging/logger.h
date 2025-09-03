@@ -3,6 +3,11 @@
 #include <iostream>
 #include <format>
 
+#ifdef _WIN32
+    #include <windows.h>
+    #include <comdef.h>
+#endif
+
 namespace lumi::debugging
 {
     /* Prints messages to console */
@@ -21,6 +26,32 @@ namespace lumi::debugging
             static Logger inst;
             return inst;
         }
+
+        #ifdef _WIN32
+        /**
+         * \brief Checks if a HRESULT failed and logs an error if failed
+         * 
+         * \param hr The HRESULT to check
+         * \param msg Message to output if HRESULT failed
+         * \return true HRESULT failed and a error message was thrown
+         * \return false HRESULT succeeded 
+         */
+        template<typename ...Args>
+        bool LogIfHRESULTFailure(HRESULT hr, const std::string& msg, Args&&... args)
+        {
+            if (FAILED(hr))
+            {
+                _com_error err(hr);
+                LogError(
+                    "{} (HRESULT: 0x{:08X}): {}", 
+                    msg, static_cast<unsigned int>(hr), 
+                    err.ErrorMessage()
+                );
+                return true;
+            }
+            return false;
+        }
+        #endif
 
         /**
          * \brief Logs a message to the console with the info severity
